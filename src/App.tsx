@@ -9,7 +9,7 @@ function App() {
 			</div>{" "}
 			<div className="flex justify-center items-center ml-3">
 				<img src={Logo} alt="logo" className="w-[2rem]" />
-				<span className="text-[2.5rem] mb-6 ml-[2px]">allete</span>
+				<span className="text-[2.5rem] mb-6 ml-[2px]">alette</span>
 			</div>
 		</main>
 	);
