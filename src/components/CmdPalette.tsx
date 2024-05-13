@@ -8,6 +8,7 @@ import {
 	CAT_ATTR_MAP,
 	DATA_CATEGORIES,
 } from "../data";
+import { Link } from "react-router-dom";
 
 interface Props {
 	isOpen: boolean;
@@ -148,11 +149,15 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 			</div>
 			<div className="flex justify-end items-center gap-1">
 				<button className="bg-blue-600 px-3 py-1 rounded">Reset Filters</button>
-				<button
+				<Link
+					to={{
+						pathname: "/result",
+						search: `?data-type=${selectedDataCat}&filters=${JSON.stringify(filters)}`
+					}}
 					className="bg-blue-600 px-3 py-1 rounded"
 					onClick={() => setIsOpen(false)}>
 					Show Pokémons
-				</button>
+				</Link>
 			</div>
 		</div>
 	);
