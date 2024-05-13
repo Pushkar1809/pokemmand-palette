@@ -10,7 +10,7 @@ import {
 } from "../data";
 import { Link } from "react-router-dom";
 import { BiReset } from "react-icons/bi";
-
+import { FaCheck } from "react-icons/fa6";
 
 interface Props {
 	isOpen: boolean;
@@ -40,19 +40,12 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 				return { ...prev, [selectedAttribute]: [value] };
 			});
 		} else if (
-			ATTR_TYPE[ATTRIBUTES[selectedAttribute]] === "checkbox" &&
-			!filters[selectedAttribute].includes(value as never)
-		) {
-			setFilters((prev) => {
-				return {
-					...prev,
-					[selectedAttribute]: checked
-						? [...prev[selectedAttribute], value]
-						: prev[selectedAttribute].filter(
-								(opt: string | number) => opt !== value,
-							),
-				};
-			});
+			ATTR_TYPE[ATTRIBUTES[selectedAttribute]] === "checkbox") {
+			if(checked && !filters[selectedAttribute].includes(value as never)) {
+				setFilters({...filters, [selectedAttribute]: [...filters[selectedAttribute], value]})
+			} else {
+				setFilters({...filters, [selectedAttribute]: filters[selectedAttribute].filter((opt: string | number) => opt !== value)})
+			}
 		}
 	};
 
@@ -66,6 +59,7 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 				setIsOpen(false);
 				setSelectedDataCat(DATA_CATEGORIES.pokemons);
 				setSelectedAttribute("");
+				setFilters({});
 			}
 		},
 		[setIsOpen],
@@ -82,7 +76,7 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 				transform: isOpen ? "scale(100%)" : "scale(0)",
 				opacity: isOpen ? 100 : 0,
 			}}
-			className="absolute bg-slate-800 text-white border border-black min-w-[50ch] max-w-[80ch] w-8/12 p-5 rounded-xl transition-all ease-in-out duration-300 z-10">
+			className="absolute bg-slate-800 text-white border border-black min-w-[50ch] max-w-[90ch] w-fit p-5 rounded-xl transition-all ease-in-out duration-300 z-10">
 			<div className="flex gap-3 mb-5">
 				<div className="flex flex-col gap-3">
 					{Object.values(DATA_CATEGORIES).map((cat: string, id: number) => (
@@ -118,18 +112,22 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 								{ATTRIBUTES[attr]}
 								<div className="flex justify-center items-center w-fit gap-1">
 									{!!filters[attr] && filters[attr].length > 0 && (
-										<span className="text-xs rounded-full px-1 bg-white/20 font-bold pb-1">
+										<span className="text-xs rounded-full px-2 bg-white/20 font-semibold">
 											{filters[attr].length}
 										</span>
 									)}
 									<FaChevronRight />
 								</div>
 							</Tile>
-							{attr === selectedAttribute && <button onClick={() => {
-								setFilters({...filters, [selectedAttribute]: []})
-							}} className="absolute w-[1.5rem] z-20 right-0 top-2 group-hover:right-[-1.5rem] transition-all ease-in-out duration-200 h-8/12 bg-white/90 text-red-600 aspect-square rounded-r-md flex justify-center items-center">
-								<BiReset className="hover:-rotate-45 transition-all ease-in-out duration-200" />
-							</button>}
+							{attr === selectedAttribute && (
+								<button
+									onClick={() => {
+										setFilters({ ...filters, [selectedAttribute]: [] });
+									}}
+									className="absolute w-[2rem] z-20 right-0 top-2 group-hover:right-[-2rem] transition-all ease-in-out duration-200 h-8/12 bg-white/90 text-red-600 aspect-square rounded-r-md flex justify-center items-center">
+									<BiReset className="hover:-rotate-45 transition-all ease-in-out duration-200" />
+								</button>
+							)}
 						</div>
 					))}
 				</div>
@@ -137,9 +135,10 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 					{!!selectedAttribute &&
 						ATTR_VALUES_MAP[ATTRIBUTES[selectedAttribute]].map(
 							(opt: { name: string; value: string | number }, id: number) => (
-								<Tile className="w-4/12" onClick={() => {}} key={id}>
+								<div className="w-4/12" key={id}>
 									<input
 										type={ATTR_TYPE[ATTRIBUTES[selectedAttribute]]}
+										className="hidden peer"
 										id={opt.name}
 										value={opt.value}
 										name={selectedAttribute}
@@ -149,35 +148,53 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 										}
 										onChange={handleInputChange}
 									/>
-									<label htmlFor={opt.name} className="ml-1">
+
+									<label
+										htmlFor={opt.name}
+										className="bg-white/10 peer-checked:bg-green-500/70 peer-checked:text-green-200 min-w-[25ch] px-5 py-3 rounded-md cursor-pointer ring-0 hover:ring-2 ring-blue-600 transition-all ease-in-out duration-200 flex justify-start gap-3 items-center">
+										<div
+											className={`w-5 h-5 p-1 flex justify-center items-center bg-green-300 rounded-${
+												ATTR_TYPE[ATTRIBUTES[selectedAttribute]] === "radio"
+													? "full"
+													: "md"
+											}`}>
+											{!!filters[selectedAttribute] &&
+												filters[selectedAttribute].includes(
+													opt.value as never,
+												) && <FaCheck className="text-green-700" />}
+										</div>
 										{opt.name}
 									</label>
-								</Tile>
+								</div>
 							),
 						)}
 				</div>
 			</div>
-			<div className="flex justify-end items-center gap-1">
+			<div className="flex justify-end items-center gap-3">
 				<button
 					onClick={() => {
 						setSelectedDataCat(DATA_CATEGORIES.pokemons);
 						setSelectedAttribute("");
 						setFilters({});
 					}}
-					className="bg-white text-black px-3 py-1 rounded">
-					Reset Filters
+					className="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium">
+					Reset All Filters
 				</button>
-				<Link
-					to={{
-						pathname: "/result",
-						search: `?data-type=${selectedDataCat}&filters=${JSON.stringify(
-							filters,
-						)}`,
-					}}
-					className="bg-blue-600 px-3 py-1 rounded"
+				<button
+					className="bg-blue-600 px-6 py-2 rounded-lg text-sm "
 					onClick={() => setIsOpen(false)}>
-					Show Pokémons
-				</Link>
+					<Link
+						to={{
+							pathname: "/result",
+							search: `?data-type=${selectedDataCat}&filters=${JSON.stringify(
+								filters,
+							)}`,
+						}}
+						className="flex justify-center items-center gap-2">
+						Show Pokémons
+						<FaChevronRight />
+					</Link>
+				</button>
 			</div>
 		</div>
 	);
