@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { DATA_CATEGORIES } from "../data";
 
 const BASE_URL = "https://beta.pokeapi.co/graphql/v1beta";
 
@@ -53,7 +54,7 @@ export function useGraphql<T = unknown>(
 	);
 
 	let requestBody: string = "";
-	if (dataCategory === "pokemons") {
+	if (dataCategory === DATA_CATEGORIES.pokemons) {
 		requestBody = JSON.stringify({
 			query: `query PokemonQuery {
     pokemons: pokemon_v2_pokemonspecies(
@@ -77,7 +78,7 @@ export function useGraphql<T = unknown>(
      }
   }`,
 		});
-	} else if (dataCategory === "moves") {
+	} else if (dataCategory === DATA_CATEGORIES.moves) {
 		requestBody = JSON.stringify({
 			query: `query MovesQuery {
       moves: pokemon_v2_move(
@@ -95,6 +96,7 @@ export function useGraphql<T = unknown>(
 		});
 	}
 
+
 	// Keep state logic separated
 	const fetchReducer = useCallback(
 		(state: State<T>, action: Action<T>): State<T> => {
@@ -102,9 +104,9 @@ export function useGraphql<T = unknown>(
 				case "loading":
 					return { ...initialState, loading: true };
 				case "fetched":
-					return { ...initialState, data: action.payload };
+					return { ...initialState, data: action.payload, loading: false };
 				case "error":
-					return { ...initialState, error: action.payload };
+					return { ...initialState, error: action.payload, loading: false };
 				case "none":
 					return { ...initialState };
 				default:
@@ -118,20 +120,16 @@ export function useGraphql<T = unknown>(
 
 	const fetchNitro = useCallback(
 		async (
-			dataCategory: string,
-			filters: Record<string, string[] | number[] | (string | number)[]>,
 			reqId: number,
 		) => {
-			if (!dataCategory || !filters) {
-				return;
-			}
-
 			dispatch({ type: "loading" });
 
 			try {
 				const data = await fetchData<T>({
 					body: requestBody,
 				});
+
+				console.log(data);
 
 				if (cancelRequest.current !== reqId) {
 					return;
@@ -154,12 +152,15 @@ export function useGraphql<T = unknown>(
 	);
 
 	useEffect(() => {
-		if (!dataCategory || !filters) {
-			dispatch({ type: "none" });
+		if (!dataCategory || Object.keys(filters).length <= 0) {
+			dispatch({
+				type: "error",
+				payload: new Error("Required Params or data category is stale"),
+			});
 			return;
 		}
 
-		fetchNitro(dataCategory, filters, cancelRequest.current);
+		fetchNitro(cancelRequest.current);
 
 		return () => {
 			cancelRequest.current += 1;
