@@ -22,33 +22,33 @@ export const useGraphQL = (
 		if (dataType === DATA_CATEGORIES.pokemons) {
 			const whereClause = [
 				filters["generation"]
-					? `{pokemon_v2_generation:{name:{_eq:"${filters["generation"][0]}"}}}`
+					? `pokemon_v2_generation:{name:{_eq:"${filters["generation"][0]}"}}`
 					: null,
 				filters["color"]
-					? `{pokemon_v2_pokemoncolor:{name:{_eq: "${filters["color"][0]}"}}}`
+					? `pokemon_v2_pokemoncolor:{name:{_eq:"${filters["color"][0]}"}}`
 					: null,
 				filters["habitat"]
-					? `{pokemon_v2_pokemonhabitat:{name:{_in:["${filters["habitat"].join(
+					? `pokemon_v2_pokemonhabitat:{name:{_in:["${filters["habitat"].join(
 							'","',
-					)}"]}}}`
+					)}"]}}`
 					: null,
 			]
 				.filter(Boolean)
 				.join(",");
 			return JSON.stringify({
-				query: `query{result:pokemon_v2_pokemonspecies(where:${whereClause}){name}}`,
+				query: `query{result:pokemon_v2_pokemonspecies(where:{${whereClause}}){name}}`,
 			});
 		} else if (dataType === DATA_CATEGORIES.moves) {
 			const whereClause = [
 				filters["class"]
-					? `{pokemon_v2_movedamageclass:{name:{_eq:"${filters["class"][0]}"}}}`
+					? `pokemon_v2_movedamageclass:{name:{_eq:"${filters["class"][0]}"}}`
 					: null,
-				filters["pp"] ? `{pp:{name:{_gt:"${filters["pp"][0]}"}}}` : null,
+				filters["pp"] ? `pp:{name:{_gt:"${filters["pp"][0]}"}}` : null,
 			]
 				.filter(Boolean)
 				.join(",");
 			return JSON.stringify({
-				query: `query{result:pokemon_v2_move(where:${whereClause}){name}}`,
+				query: `query{result:pokemon_v2_move(where:{${whereClause}}){name}}`,
 			});
 		}
 	}, [dataType, filters]);
