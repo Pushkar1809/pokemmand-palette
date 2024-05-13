@@ -19,17 +19,23 @@ const Result = () => {
 				className="bg-blue-700/10 text-blue-700 px-3 py-1 rounded-lg fixed top-10 left-10 w-fit">
 				{"< Back"}
 			</Link>
-			{!!error && <h1 className="text-2xl font-bold">Something Went Wrong</h1>}
+			{!!error && (
+				<h1 className="text-2xl font-bold text-left">Something Went Wrong</h1>
+			)}
 			{!!loading && (
-				<h1 className="text-2xl font-bold">Loading {dataType}...</h1>
+				<h1 className="text-2xl font-bold text-left">Loading {dataType}...</h1>
 			)}
 			{!!data && (
-				<h1 className="text-2xl font-bold">
+				<h1 className="text-2xl font-bold text-left">
 					Found {data.result.length} {dataType}
 				</h1>
 			)}
-			{!!error && <pre className="font-mono text-red-700 bg-red-500/20 rounded-xl py-5 px-7 mt-10">{JSON.stringify(error)}</pre>}
-			{!!loading && <LuLoader2 className="animate-spin mt-10"/>}
+			{!!error && (
+				<pre className="font-mono text-red-700 bg-red-500/20 rounded-xl py-5 px-7 mt-10">
+					{JSON.stringify(error, null, 2)}
+				</pre>
+			)}
+			{!!loading && <LuLoader2 className="animate-spin mt-10" />}
 			{!!data && (
 				<div className="flex flex-col items-center justify-start gap-2 w-full max-w-[50ch] mt-5 max-h-[85vh] overflow-y-scroll">
 					{data.result.map(({ name }: { name: string }, id: number) => (
