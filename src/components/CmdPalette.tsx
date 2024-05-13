@@ -9,6 +9,8 @@ import {
 	DATA_CATEGORIES,
 } from "../data";
 import { Link } from "react-router-dom";
+import { BiReset } from "react-icons/bi";
+
 
 interface Props {
 	isOpen: boolean;
@@ -80,11 +82,12 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 				transform: isOpen ? "scale(100%)" : "scale(0)",
 				opacity: isOpen ? 100 : 0,
 			}}
-			className="absolute bg-slate-800 text-white border border-black w-fit min-w-[60ch]  p-5 rounded-xl transition-all ease-in-out duration-300 z-10">
+			className="absolute bg-slate-800 text-white border border-black min-w-[50ch] max-w-[80ch] w-8/12 p-5 rounded-xl transition-all ease-in-out duration-300 z-10">
 			<div className="flex gap-3 mb-5">
 				<div className="flex flex-col gap-3">
 					{Object.values(DATA_CATEGORIES).map((cat: string, id: number) => (
 						<Tile
+							className="w-4/12"
 							isSelected={selectedDataCat === cat}
 							key={id}
 							onClick={() => {
@@ -94,11 +97,12 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 							}}>
 							{cat}
 							<div className="flex justify-center items-center w-fit gap-1">
-								{Object.values(filters).flat().length > 0 && selectedDataCat === cat && (
-									<span className="text-xs rounded-full px-2 bg-white/20 font-semibold">
-										{Object.values(filters).flat().length}
-									</span>
-								)}
+								{Object.values(filters).flat().length > 0 &&
+									selectedDataCat === cat && (
+										<span className="text-xs rounded-full px-2 bg-white/20 font-semibold">
+											{Object.values(filters).flat().length}
+										</span>
+									)}
 								<FaChevronRight />
 							</div>
 						</Tile>
@@ -106,28 +110,34 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 				</div>
 				<div className="flex flex-col gap-3">
 					{CAT_ATTR_MAP[selectedDataCat].map((attr: string, id: number) => (
-						<Tile
-							isSelected={selectedAttribute === attr}
-							className="flex justify-between items-center"
-							onClick={() => setSelectedAttribute(attr)}
-							key={id}>
-							{ATTRIBUTES[attr]}
-							<div className="flex justify-center items-center w-fit gap-1">
-								{!!filters[attr] && (
-									<span className="text-xs rounded-full px-1 bg-white/20 font-bold pb-1">
-										{filters[attr].length}
-									</span>
-								)}
-								<FaChevronRight />
-							</div>
-						</Tile>
+						<div key={id} className="relative group z-30">
+							<Tile
+								isSelected={selectedAttribute === attr}
+								className="relative flex justify-between items-center w-4/12 z-30"
+								onClick={() => setSelectedAttribute(attr)}>
+								{ATTRIBUTES[attr]}
+								<div className="flex justify-center items-center w-fit gap-1">
+									{!!filters[attr] && filters[attr].length > 0 && (
+										<span className="text-xs rounded-full px-1 bg-white/20 font-bold pb-1">
+											{filters[attr].length}
+										</span>
+									)}
+									<FaChevronRight />
+								</div>
+							</Tile>
+							{attr === selectedAttribute && <button onClick={() => {
+								setFilters({...filters, [selectedAttribute]: []})
+							}} className="absolute w-[1.5rem] z-20 right-0 top-2 group-hover:right-[-1.5rem] transition-all ease-in-out duration-200 h-8/12 bg-white/90 text-red-600 aspect-square rounded-r-md flex justify-center items-center">
+								<BiReset className="hover:-rotate-45 transition-all ease-in-out duration-200" />
+							</button>}
+						</div>
 					))}
 				</div>
 				<div className="flex flex-col gap-3">
 					{!!selectedAttribute &&
 						ATTR_VALUES_MAP[ATTRIBUTES[selectedAttribute]].map(
 							(opt: { name: string; value: string | number }, id: number) => (
-								<Tile onClick={() => {}} key={id}>
+								<Tile className="w-4/12" onClick={() => {}} key={id}>
 									<input
 										type={ATTR_TYPE[ATTRIBUTES[selectedAttribute]]}
 										id={opt.name}
@@ -148,11 +158,21 @@ const CmdPalette = ({ isOpen, setIsOpen }: Props) => {
 				</div>
 			</div>
 			<div className="flex justify-end items-center gap-1">
-				<button className="bg-blue-600 px-3 py-1 rounded">Reset Filters</button>
+				<button
+					onClick={() => {
+						setSelectedDataCat(DATA_CATEGORIES.pokemons);
+						setSelectedAttribute("");
+						setFilters({});
+					}}
+					className="bg-white text-black px-3 py-1 rounded">
+					Reset Filters
+				</button>
 				<Link
 					to={{
 						pathname: "/result",
-						search: `?data-type=${selectedDataCat}&filters=${JSON.stringify(filters)}`
+						search: `?data-type=${selectedDataCat}&filters=${JSON.stringify(
+							filters,
+						)}`,
 					}}
 					className="bg-blue-600 px-3 py-1 rounded"
 					onClick={() => setIsOpen(false)}>
