@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { DATA_CATEGORIES } from "@/data";
+import { DATA_CATEGORIES } from "../data";
 const BASE_URL = "https://beta.pokeapi.co/graphql/v1beta";
 
 interface State {

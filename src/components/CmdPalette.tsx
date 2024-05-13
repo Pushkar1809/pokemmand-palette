@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
-import Tile from "@/components/Tile";
+import Tile from "./Tile";
 import { FaChevronRight } from "react-icons/fa6";
 import {
 	ATTR_TYPE,

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Logo from "@/assets/p.svg";
-import CmdPalette from "@/components/CmdPalette";
+import Logo from "../assets/p.svg";
+import CmdPalette from "../components/CmdPalette";
 
 const Home = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);

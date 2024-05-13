@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LuLoader2 } from "react-icons/lu";
-import { useGraphQL } from "@/hooks/useGraphQL";
+import { useGraphQL } from "../hooks/useGraphQL";
 
 
 const Result = () => {
